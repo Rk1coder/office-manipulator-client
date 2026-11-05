@@ -2,6 +2,8 @@
 
 Yaver'in web arayüzü olmayan, **yalnızca HTTP API ile çalışan** sürümüdür. Docker ile kurulur; kurulumdan sonra başka uygulamalar API anahtarıyla bağlanıp belge üretir (DOCX, PPTX, XLSX, PDF, CSV, …), düzenler, dönüştürür ve indirir. Dosya saklama, önizleme ve biçim dönüştürme (ONLYOFFICE ile) **tamamen yerel** çalışır. AI ile üretim (Claude, Gemini veya GPT) isteğe bağlıdır ve internet gerektirir; LLM anahtarı girilmediği sürece bu uç noktalar `503` döner, geri kalan her şey etkilenmeden çalışır.
 
+![Yaver API teknik mimarisi](docs/images/mimari.webp)
+
 ## API ile kullanım
 
 Docker ayağa kalktığında uygulama **yalnızca bir API servisi** olarak çalışır: web arayüzü yoktur; her şey (belge üretme, plan onaylama, düzenleme, dönüştürme, indirme, ayarlar) HTTP API ile yapılır. Böylece başka uygulamalar Yaver'e doğrudan bağlanabilir.
