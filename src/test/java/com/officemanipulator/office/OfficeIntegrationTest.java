@@ -65,16 +65,13 @@ class OfficeIntegrationTest {
   assertThrows(RuntimeException.class,()->callback(id,6));assertEquals(0,office.session(id).revision());assertNotNull(office.session(id).error());assertEquals(1,jobs.count());
   doReturn(word("Recovered")).when(docs).download(anyString(),any());callback(id,6);assertNull(office.session(id).error());assertEquals(1,office.session(id).revision());
  }
- @Test void transportRejectsUnsignedCallbackAndWrongPurposeDownloadAndAllowsScopedPluginFrame() throws Exception {
+ @Test void transportRejectsUnsignedCallbackAndWrongPurposeDownload() throws Exception {
   var opened=office.open(fixture().getId());UUID id=(UUID)opened.get("sessionId");
   assertEquals(HttpStatus.FORBIDDEN,http.postForEntity("/api/office/sessions/"+id+"/callback",Map.of("status",6),String.class).getStatusCode());
   assertEquals(HttpStatus.FORBIDDEN,http.getForEntity("/api/office/sessions/"+id+"/document?ticket="+opened.get("agentToken"),String.class).getStatusCode());
   assertEquals(HttpStatus.BAD_REQUEST,http.getForEntity("/api/office/sessions/"+id+"/document",String.class).getStatusCode());
   String ticket=tokens.ticket(id,"document",office.session(id).expiresAt().toInstant());
   assertEquals(HttpStatus.OK,http.getForEntity("/api/office/sessions/"+id+"/document?ticket="+ticket,byte[].class).getStatusCode());
-  var plugin=http.getForEntity("/office-plugin/config.json?session="+id+"&ticket="+opened.get("agentToken"),String.class);
-  assertEquals(HttpStatus.OK,plugin.getStatusCode());assertNull(plugin.getHeaders().getFirst("X-Frame-Options"));assertTrue(plugin.getHeaders().getFirst("Content-Security-Policy").contains("localhost:8082"));
-  assertEquals("SAMEORIGIN",http.getForEntity("/office-editor.html",String.class).getHeaders().getFirst("X-Frame-Options"));
  }
  @Test void olderRequestReplayCannotReplaceNewerSaveAndIdenticalContentStillAcknowledged() throws Exception {
   UUID id=(UUID)office.open(fixture().getId()).get("sessionId");UUID a=UUID.randomUUID(),b=UUID.randomUUID(),c=UUID.randomUUID();

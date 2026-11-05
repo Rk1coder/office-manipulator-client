@@ -19,7 +19,6 @@ import java.util.*;
 @Service
 @ConditionalOnProperty(name="app.office.enabled",havingValue="true")
 public class OfficeService {
-    public static final String PLUGIN_GUID="asc.{9B37D1E8-70D5-48A2-B2E4-8F3B6194B704}";
     public static final Set<OutputFormat> EDITABLE_FORMATS=EnumSet.of(OutputFormat.DOCX,OutputFormat.PPTX,OutputFormat.XLSX,OutputFormat.CSV,OutputFormat.PDF,
         OutputFormat.ODT,OutputFormat.ODS,OutputFormat.ODP,OutputFormat.DOC,OutputFormat.TXT);
     /** Formats ONLYOFFICE cannot open at all — edited through the app's own plain-text editor instead. */
@@ -180,9 +179,7 @@ public class OfficeService {
             "url",appInternal+"/api/office/sessions/"+s.id()+"/document?ticket="+docTicket,
             "permissions",Map.of("edit",true,"download",true,"print",true)));
         config.put("editorConfig",Map.of("mode","edit","lang","tr","callbackUrl",appInternal+"/api/office/sessions/"+s.id()+"/callback",
-            "user",Map.of("id","local-user","name","Kullanıcı"),"customization",Map.of("forcesave",false),
-            "plugins",Map.of("pluginsData",List.of(appPublic+"/office-plugin/config.json?session="+s.id()+"&ticket="+pluginTicket),
-                "autostart",List.of(PLUGIN_GUID))));
+            "user",Map.of("id","local-user","name","Kullanıcı"),"customization",Map.of("forcesave",false)));
         config.put("token",tokens.sign(config));
         return Map.of("sessionId",s.id(),"apiScriptUrl",publicUrl+"/web-apps/apps/api/documents/api.js","config",config,"agentToken",pluginTicket);
     }
@@ -234,19 +231,6 @@ public class OfficeService {
             db.update("UPDATE office_sessions SET saved_job_id=?,revision=revision+1,saved_at=now(),content_hash=?,error=NULL,closed=true WHERE id=?",
                 restored.getId(),hash(bytes),sessionId);
         });
-    }
-    /** Headless bridge: no button, no UI — relays GetSelectedText/PasteText between ONLYOFFICE's
-     * internal plugin sandbox and the app's own right-side chat panel in office-editor.html via
-     * postMessage. The visible AI chat UI itself lives entirely outside ONLYOFFICE now. */
-    public Map<String,Object> pluginConfig(UUID id,String ticket) {
-        boolean qualified=id!=null && ticket!=null;
-        if(qualified) {tokens.requireTicket(ticket,id,"agent");session(id);}
-        Map<String,Object> variation=new LinkedHashMap<>();
-        variation.put("description","");variation.put("url",qualified?"bridge.html?session="+id+"&ticket="+ticket:"bridge.html");
-        variation.put("icons",List.of("icon-robot.png","icon-robot.png"));variation.put("isViewer",false);variation.put("EditorsSupport",List.of("word","slide","cell"));
-        variation.put("isVisual",false);variation.put("isModal",false);variation.put("isInsideMode",true);
-        variation.put("initDataType","none");variation.put("initData","");variation.put("events",List.of("onTargetPositionChanged"));
-        return Map.of("name","Yaver","guid",PLUGIN_GUID,"baseUrl",appPublic+"/office-plugin/","variations",List.of(variation));
     }
     public Map<String,Object> status(UUID id) {
         Session s=session(id);Map<String,Object> result=new LinkedHashMap<>();

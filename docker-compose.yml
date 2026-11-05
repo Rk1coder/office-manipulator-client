@@ -50,7 +50,6 @@ services:
       # API service mode: every /api call needs one of these keys (Authorization: Bearer <key>).
       YAVER_API_KEYS: ${YAVER_API_KEYS:?Set YAVER_API_KEYS in .env (openssl rand -hex 32)}
       YAVER_CORS_ORIGINS: ${YAVER_CORS_ORIGINS:-}
-      WEB_UI_ENABLED: ${WEB_UI_ENABLED:-false}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/officemanipulator
       SPRING_DATASOURCE_USERNAME: app
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}

@@ -75,16 +75,8 @@ api('/api/office/sessions/' + session + '/callback', callback, headers)
 assert api('/api/office/sessions/' + session)['revision'] == 1
 reopened = api('/api/office/jobs/' + original + '/session', {})
 assert api('/api/office/sessions/' + reopened['sessionId'])['savedJobId'] == status['savedJobId']
-# Browser resource policies and cross-origin plugin config are checked over HTTP.
-_, editor_headers = request(APP + '/office-editor.html')
-assert editor_headers.get('X-Frame-Options') == 'SAMEORIGIN'
-plugin_url = reopened['config']['editorConfig']['plugins']['pluginsData'][0]
-plugin_bytes, plugin_headers = request(plugin_url, headers={'Origin': DOCS})
-assert plugin_headers.get('Access-Control-Allow-Origin') == DOCS
-assert 'X-Frame-Options' not in plugin_headers
-assert json.loads(plugin_bytes)['guid'].startswith('asc.')
 assert api('/api/budget') == before_budget, 'Unexpected budget change'
-evidence = {'result': 'PASS', 'checks': ['DOCX import', 'signed internal document download by real ONLYOFFICE', 'real DOCX conversion', 'unsigned callback rejected', 'signed callback persists new version', 'original bytes preserved', 'duplicate callback idempotent', 'reopen uses saved version', 'editor framing header', 'plugin origin CORS', 'no API budget change'], 'demoJobId': original, 'savedJobId': status['savedJobId'], 'manualBrowserAcceptance': 'Not executed: no browser available', 'callbackNote': 'Save notification was replayed by test against real Docs conversion output; no browser typing simulated.'}
+evidence = {'result': 'PASS', 'checks': ['DOCX import', 'signed internal document download by real ONLYOFFICE', 'real DOCX conversion', 'unsigned callback rejected', 'signed callback persists new version', 'original bytes preserved', 'duplicate callback idempotent', 'reopen uses saved version', 'no API budget change'], 'demoJobId': original, 'savedJobId': status['savedJobId'], 'manualBrowserAcceptance': 'Not executed: no browser available', 'callbackNote': 'Save notification was replayed by test against real Docs conversion output; no browser typing simulated.'}
 path = ROOT / 'target/verification/office-smoke.json'
 path.parent.mkdir(parents=True, exist_ok=True)
 path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + '\n')

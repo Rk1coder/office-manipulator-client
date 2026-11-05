@@ -70,7 +70,6 @@ public class OfficeController {
     // session/ticket-qualified URL ONLYOFFICE itself already loaded bridge.html with. Both
     // params are therefore optional here; a session-less request just returns the manifest
     // shape (no secrets in it) so the SDK's own init sequence can complete.
-    @GetMapping("/office-plugin/config.json") public Map<String,Object> plugin(@RequestParam(required=false) UUID session,@RequestParam(required=false) String ticket){return office.pluginConfig(session,ticket);}
     @GetMapping("/api/office/text/{jobId}") public OfficeService.TextDocument readText(@PathVariable UUID jobId){return office.readText(jobId);}
     @PostMapping("/api/office/text/{jobId}") public OfficeService.TextDocument saveText(@PathVariable UUID jobId,@RequestBody Map<String,String> body){
         return office.saveText(jobId,body.get("content"));

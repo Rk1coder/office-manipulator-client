@@ -123,7 +123,7 @@ Tüm uçlar `app` servisi (varsayılan `http://localhost:8081`) üzerinden sunul
 ## 5. Sınırlamalar
 
 - **AI/Chat özelliği internet gerektirir.** `ANTHROPIC_API_KEY` (ve opsiyonel `GEMINI_API_KEY`) Anthropic/Google'ın bulut API'lerine HTTPS çağrısı yapar. Air-gapped bir ortamda bu anahtarlar tanımlanmamalı; tanımlanmazsa uygulama normal başlar, sadece `/api/chat` ve Yaver Agent eklentisinin "öneri" özelliği `503 Service Unavailable` döner. Dosya yükleme/indirme, format dönüştürme ve ONLYOFFICE ile belge düzenleme bundan etkilenmez ve tamamen offline çalışır.
-- **ONLYOFFICE eklenti SDK'sı vendor edilmiştir.** Önceden `onlyoffice.github.io` CDN'inden yüklenen `plugins.js`, artık `src/main/resources/static/office-plugin/plugins.js` olarak projeye gömülüdür; tarayıcı hiçbir dış adrese istek yapmaz.
+- **Tarayıcı tarafı yoktur.** Bu sürüm yalnızca API sunar; ONLYOFFICE eklentisi ve web arayüzü dosyaları kaldırılmıştır, dış adrese istek yapılmaz.
 - **Docker base imajları önceden indirilmelidir.** `postgres:16-alpine`, `onlyoffice/documentserver:10.0.0` ve derlenen `app` imajı, air-gapped ortama taşınmadan önce internetli bir makinede çekilip `docker save`/`docker load` ile aktarılmalıdır (bkz. Bölüm 1-2).
 - `scripts/office-native`, `compose.office.yml`, `compose.office-host.yml` ayrı bir **geliştirme/deneme (trial)** akışına aittir (bkz. [onlyoffice-setup.md](onlyoffice-setup.md)) ve `ANTHROPIC_API_KEY`'i zorunlu kılar; air-gapped production teslimatı için kullanılmaz — bu teslimat için tek kaynak kök dizindeki `docker-compose.yml`'dir.
 

@@ -1,56 +1,10 @@
-# Office Manipulator — Kurulum (internetsiz ortam)
+# Yaver API (Office Manipulator — yalnızca API sürümü)
 
-Bu, Office Manipulator'ın internet bağlantısı olmayan bir bilgisayarda çalıştırılması için hazırlanmış teslim paketidir. Dosya yükleme/indirme, belge önizleme, biçim dönüştürme (ör. Word → PDF) ve ONLYOFFICE ile tarayıcı içi belge düzenleme **tamamen yerel** çalışır — internet gerekmez. AI (sohbet, AI ile belge üretimi, Yaver'in yazım önerileri; Claude, Gemini veya GPT ile) isteğe bağlıdır ve yalnızca internet varsa kullanılabilir; API anahtarı girilmediği sürece bu özellikler kapalı kalır, geri kalan her şey etkilenmeden çalışır.
-
-## Ekran görüntüleri
-
-| Ana sayfa | AI ayarları |
-|---|---|
-| ![Yaver ana sayfa](docs/screenshots/anasayfa.gif) | ![Yaver AI ayarları](docs/screenshots/ayarlar.gif) |
-
-| PPTX oluşturma | Plan onaylama |
-|---|---|
-| ![PPTX oluşturma](docs/screenshots/pptx-olusturma.webp) | ![Plan onaylama](docs/screenshots/plan-onaylama.webp) |
-
-| PDF çıktısı (ONLYOFFICE) | CSV oluşturma |
-|---|---|
-| ![PDF çıktısı](docs/screenshots/pdf-ciktisi.webp) | ![CSV oluşturma](docs/screenshots/csv-olusturma.webp) |
-
-| DOCX düzenleme (ONLYOFFICE) |
-|---|
-| ![DOCX düzenleme](docs/screenshots/docx-duzenleme.webp) |
-
-## Yeni özellikler
-
-| Üç yapay zekâ sağlayıcısı: Anthropic, Gemini, OpenAI | Bilgi kartları ve kullanım rehberi |
-|---|---|
-| ![Çoklu LLM ayarları](docs/screenshots/coklu-llm-ayarlar.gif) | ![Bilgi kartları](docs/screenshots/bilgi-kartlari.gif) |
-| Ayarlar'da sağlayıcı seçilir, kendi API anahtarı girilip doğrulanır; model listeden seçilir ya da "Diğer (elle gir)" ile yazılır. Ayarlar dikey sekmeli: Yapay zekâ, Görsel üretim, Görünüm. | Sağ altta, tıklayınca sıradakine geçen 8 kartlık deste: Yaver nedir, API anahtarı, istek yazma, plan ve üretim, düzenleme, model seçimi, maliyet, API entegrasyonu. Her kartta bir yönlendirme düğmesi; üzerine gelince ekran görüntüleri yelpaze gibi açılır. |
-
-| Görsel incelemeli sunum üretimi | Yaver Agent sohbet paneli |
-|---|---|
-| ![Sunum örneği](docs/screenshots/sunum-ornegi.gif) | ![Yaver Agent](docs/screenshots/yaver-agent-sohbet.gif) |
-| Sunumlar tasarım rehberleriyle üretilir, slaytlar görüntüye çevrilip yapay zekâya gösterilir ve taşan yazı, boş alan, okunmayan renk gibi kusurlar düzeltilir; en az kusurlu sürüm teslim edilir. Gemini anahtarıyla slaytlara görsel üretilir; fontlar konuya göre hazır eşleştirmelerden seçilir. Dosya adları içerikten türetilir. | Editördeki asistan mesaj akışı biçiminde: istek balonları, "N sn'de hazırladı" özeti, HAZIR / UYGULANDI durum çipleri ve açılabilir değişiklik farkı. |
-
-| Animasyonlu tema geçişi |
-|---|
-| ![Tema geçişi](docs/screenshots/tema-gecisi.gif) |
-| Açık/koyu tema düğmeden yayılan bir daire ile değişir; açık temada logo da açık tema sürümüne geçer. |
-
-### Kendi anahtarınızla API çağrısı
-
-Kullanıcıya dönük eşzamanlı uç noktalar (`POST /api/chat`, belge düzenleme, Yaver Agent) istek gövdesinde isteğe bağlı `llm_provider`, `llm_api_key`, `llm_model` alanlarını kabul eder; o istek `.env`'deki varsayılan yerine bu anahtarla çalışır ve anahtar saklanmaz. Arka plan ve zamanlanmış işler her zaman `.env` değerlerini kullanır. Sağlayıcı yalnızca `anthropic`, `gemini` veya `openai` olabilir; istekten adres/uç nokta kabul edilmez.
-
-```bash
-curl -X POST http://localhost:8081/api/chat \
-  -H "Authorization: Bearer $YAVER_API_KEY" \
-  -H 'Content-Type: application/json' \
-  -d '{"message": "<isteğiniz>", "format": "DOCX", "llm_provider": "gemini", "llm_api_key": "<anahtarınız>", "llm_model": "gemini-2.5-pro"}'
-```
+Yaver'in web arayüzü olmayan, **yalnızca HTTP API ile çalışan** sürümüdür. Docker ile kurulur; kurulumdan sonra başka uygulamalar API anahtarıyla bağlanıp belge üretir (DOCX, PPTX, XLSX, PDF, CSV, …), düzenler, dönüştürür ve indirir. Dosya saklama, önizleme ve biçim dönüştürme (ONLYOFFICE ile) **tamamen yerel** çalışır. AI ile üretim (Claude, Gemini veya GPT) isteğe bağlıdır ve internet gerektirir; LLM anahtarı girilmediği sürece bu uç noktalar `503` döner, geri kalan her şey etkilenmeden çalışır.
 
 ## API ile kullanım
 
-Docker ayağa kalktığında uygulama **yalnızca bir API servisi** olarak çalışır: web arayüzü sunulmaz, sitede yapılabilen her şey (belge üretme, plan onaylama, düzenleme, dönüştürme, indirme, ayarlar) HTTP API ile yapılır. Böylece başka uygulamalar Yaver'e doğrudan bağlanabilir.
+Docker ayağa kalktığında uygulama **yalnızca bir API servisi** olarak çalışır: web arayüzü yoktur; her şey (belge üretme, plan onaylama, düzenleme, dönüştürme, indirme, ayarlar) HTTP API ile yapılır. Böylece başka uygulamalar Yaver'e doğrudan bağlanabilir.
 
 **Kimlik doğrulama:** Her `/api/...` isteği `.env`'deki `YAVER_API_KEYS` anahtarlarından birini taşımalıdır:
 
@@ -109,6 +63,17 @@ curl -H "$H" -OJ $B/api/files/<jobId>/download
 **Tarayıcıdan çağrı (CORS):** Sunucudan sunucuya çağrılarda bir şey gerekmez. Başka bir alan adındaki web uygulaması tarayıcıdan çağıracaksa o adresi `YAVER_CORS_ORIGINS=https://portal.ornek.com` şeklinde ekleyin; listede olmayan kaynaklardan gelen tarayıcı istekleri `403` alır.
 
 > **Güvenlik:** API anahtarı düz HTTP üzerinden açık metin gider. Uygulamayı internete ya da güvenilmeyen bir ağa açacaksanız önüne HTTPS sonlandıran bir ters vekil (nginx, Caddy, Traefik) koyun ve `.env`'de `API_BIND_ADDRESS=127.0.0.1` yapın. `/internal/...` uç noktaları her durumda yalnızca konteynerin kendisinden erişilebilir.
+
+### İstek başına LLM anahtarı
+
+Kullanıcıya dönük eşzamanlı uç noktalar (`POST /api/chat`, belge düzenleme, `POST /api/office/sessions/{id}/agent`) istek gövdesinde isteğe bağlı `llm_provider`, `llm_api_key`, `llm_model` alanlarını kabul eder; o istek `.env`'deki varsayılan yerine bu anahtarla çalışır ve anahtar saklanmaz. Arka plan ve zamanlanmış işler her zaman `.env` değerlerini kullanır. Sağlayıcı yalnızca `anthropic`, `gemini` veya `openai` olabilir; istekten adres/uç nokta kabul edilmez.
+
+```bash
+curl -X POST http://localhost:8081/api/chat \
+  -H "Authorization: Bearer $YAVER_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"message": "<isteğiniz>", "format": "DOCX", "llm_provider": "gemini", "llm_api_key": "<anahtarınız>", "llm_model": "gemini-2.5-pro"}'
+```
 
 ## Gereksinimler
 
@@ -186,11 +151,10 @@ docker compose -p office-manipulator-teslim logs -f app   # yalnızca uygulama s
 | `YAVER_API_KEYS` | Diğer uygulamaların API'ye bağlanırken kullanacağı anahtar(lar), virgülle ayrılmış, her biri en az 24 karakter | **Zorunlu** — `openssl rand -hex 32` ile üretin |
 | `YAVER_CORS_ORIGINS` | Tarayıcıdan API çağırabilecek başka alan adları | Sunucudan sunucuya kullanımda boş bırakın |
 | `API_BIND_ADDRESS`, `API_PORT` | API'nin dinlediği arayüz ve port | Varsayılan `0.0.0.0:8081`; önünde HTTPS ters vekil varsa `127.0.0.1` |
-| `WEB_UI_ENABLED` | Web arayüzünü de sunar (yine API anahtarı arkasında) | Varsayılan `false` |
 | `OFFICE_JWT_SECRET` | ONLYOFFICE ↔ uygulama imzalama anahtarı | **Zorunlu** — `openssl rand -hex 32` ile üretin |
-| `LLM_PROVIDER` | Varsayılan yapay zekâ sağlayıcısı: `anthropic`, `gemini` veya `openai` | Varsayılan `anthropic`; arayüzün **Ayarlar** bölümünden de değiştirilebilir |
-| `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY` | Seçilen sağlayıcının API anahtarı (müşterinin kendi anahtarı; sunucu LLM ücreti ödemez) | Boş bırakın — AI özellikleri kapalı kalır. İnternet erişimi olan bir ortamda **Ayarlar** bölümünden de girip doğrulayabilirsiniz, `.env`'e yazmak zorunlu değildir |
-| `ANTHROPIC_MODEL`, `GEMINI_MODEL`, `OPENAI_MODEL` | Sağlayıcıların varsayılan modeli | Boş bırakılabilir; Ayarlar'dan listeden seçilir |
+| `LLM_PROVIDER` | Varsayılan yapay zekâ sağlayıcısı: `anthropic`, `gemini` veya `openai` | Varsayılan `anthropic`; `POST /api/settings` ile de değiştirilebilir |
+| `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY` | Seçilen sağlayıcının API anahtarı (müşterinin kendi anahtarı; sunucu LLM ücreti ödemez) | Boş bırakın — AI özellikleri kapalı kalır. İnternet erişimi olan bir ortamda `POST /api/settings/verify` ile de girip doğrulayabilirsiniz, `.env`'e yazmak zorunlu değildir |
+| `ANTHROPIC_MODEL`, `GEMINI_MODEL`, `OPENAI_MODEL` | Sağlayıcıların varsayılan modeli | Boş bırakılabilir; `GET /api/settings` listesinden seçilip kaydedilir |
 | `LLM_INPUT_PRICE_PER_MILLION`, `LLM_OUTPUT_PRICE_PER_MILLION` | Varsayılan modelin fiyatı (USD / 1M token), bütçe koruması için | Claude için boş bırakılabilir; Gemini/OpenAI modellerinde güncel fiyat girilmelidir |
 | `ANTHROPIC_BASE_URL` | Anthropic API uç noktası | Ayarlamayın (resmî adres kullanılır) — yalnızca kendi barındırdığınız bir Claude-uyumlu uç nokta kullanacaksanız doldurun |
 | `PRESENTATION_REVIEW_ROUNDS` | Sunumlarda görsel inceleme ve düzeltme turu sayısı | Varsayılan `2`; `0` kapatır (her tur bir inceleme + bir yeniden üretim çağrısı demektir) |
@@ -202,8 +166,8 @@ AI kapalıyken (anahtar boşken) model ve fiyat satırları etkisizdir; dokunman
 
 ## Sınırlamalar
 
-- AI özellikleri (sohbet, AI ile belge/sunum üretimi, Yaver'in önerileri) internet gerektirir ve seçilen sağlayıcının anahtarı boşken kapalıdır — bu beklenen bir durumdur, hata değildir.
-- Dosya yükleme/indirme, önizleme, biçim dönüştürme ve ONLYOFFICE ile belge düzenleme internet olmadan da tam çalışır.
+- AI özellikleri (AI ile belge/sunum üretimi ve düzenleme) internet gerektirir ve seçilen sağlayıcının anahtarı boşken kapalıdır — bu beklenen bir durumdur, hata değildir.
+- Dosya yükleme/indirme, önizleme, biçim dönüştürme ve ONLYOFFICE ile biçim dönüştürme internet olmadan da tam çalışır.
 - Port `8081` veya `8082` başka bir uygulama/konteyner tarafından kullanılıyorsa, `docker-compose.yml` içindeki ilgili `ports:` ayarını (API için `.env`'deki `API_PORT`) değiştirip `bash baslat.sh`'ı tekrar çalıştırın.
 
 ## Sorun giderme

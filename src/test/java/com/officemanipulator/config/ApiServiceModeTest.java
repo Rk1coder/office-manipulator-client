@@ -16,7 +16,6 @@ class ApiServiceModeTest {
         WebConfig filter = new WebConfig();
         ReflectionTestUtils.setField(filter, "officeEnabled", true);
         ReflectionTestUtils.setField(filter, "appInternalUrl", "http://app:8080");
-        ReflectionTestUtils.setField(filter, "webUiEnabled", false);
         filter.setApiKeys(keys);
         filter.setAllowedOrigins("https://portal.example.com");
         return filter;
@@ -63,10 +62,11 @@ class ApiServiceModeTest {
         assertEquals(0, run(f, get("/api/office/preview/" + java.util.UUID.randomUUID() + "/document", "app")), "ticket-checked transport");
     }
 
-    @Test void webUiAndInternalRoutesAreNotServedInApiMode() throws Exception {
+    @Test void noWebUiAndInternalRoutesStayLocal() throws Exception {
         var f = filter(KEY);
         assertEquals(404, run(f, get("/index.html", "localhost")));
         assertEquals(404, run(f, get("/office-plugin/config.json", "localhost")));
+        assertEquals(404, run(filter(""), get("/index.html", "localhost")), "no UI even as a local tool");
         var root = new MockHttpServletResponse();
         f.doFilter(get("/", "api.example.com"), root, (req, res) -> fail("root must redirect"));
         assertEquals("/docs", root.getRedirectedUrl());

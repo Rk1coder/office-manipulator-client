@@ -34,8 +34,6 @@ app:
     keys: ${YAVER_API_KEYS:}
     # Browser apps on these exact origins may call the API (CORS), e.g. https://portal.example.com
     allowed-origins: ${YAVER_CORS_ORIGINS:}
-  web-ui:
-    enabled: ${WEB_UI_ENABLED:false}
   sandbox:
     preflight: ${SANDBOX_PREFLIGHT:false}
   agent:

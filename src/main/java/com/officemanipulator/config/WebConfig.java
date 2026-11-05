@@ -17,24 +17,18 @@ import java.util.Set;
 
 /**
  * Without YAVER_API_KEYS this is a local tool: localhost only, same-origin API. With keys it is an API
- * service: any host may call /api/** with a valid key, listed origins get CORS, and the web UI is served
- * only when app.web-ui.enabled is true. Signed ONLYOFFICE transport routes and /internal stay as before.
+ * service: any host may call /api/** with a valid key and listed origins get CORS. There is no web UI: only
+ * the API, its docs and /health are served. Signed ONLYOFFICE transport routes and /internal stay as before.
  */
 @Component
 public class WebConfig extends OncePerRequestFilter {
     private static final Set<String> HOSTS = Set.of("localhost", "127.0.0.1", "[::1]", "::1");
     @org.springframework.beans.factory.annotation.Value("${app.office.enabled:false}")
     private boolean officeEnabled;
-    @org.springframework.beans.factory.annotation.Value("${app.office.public-url:http://localhost:8082}")
-    private String officePublicUrl="http://localhost:8082";
-    @org.springframework.beans.factory.annotation.Value("${app.office.app-public-url:http://localhost:8090}")
-    private String appPublicUrl="http://localhost:8090";
     @org.springframework.beans.factory.annotation.Value("${app.office.app-internal-url:http://office-app:8080}")
     private String appInternalUrl="http://office-app:8080";
     @org.springframework.beans.factory.annotation.Value("${app.office.transport.port:0}")
     private int officeTransportPort;
-    @org.springframework.beans.factory.annotation.Value("${app.web-ui.enabled:true}")
-    private boolean webUiEnabled=true;
     private List<byte[]> apiKeys=List.of();
     private Set<String> allowedOrigins=Set.of();
     private static final List<String> PUBLIC_PREFIXES=List.of("/api/", "/docs", "/swagger-ui", "/v3/api-docs", "/health");
@@ -71,23 +65,12 @@ public class WebConfig extends OncePerRequestFilter {
         if (!local && (!apiMode || internal)) {
             response.sendError(403, "Only localhost access is supported"); return;
         }
-        if (!webUiEnabled && !internal && PUBLIC_PREFIXES.stream().noneMatch(path::startsWith)) {
+        if (!internal && PUBLIC_PREFIXES.stream().noneMatch(path::startsWith)) {
             if (path.equals("/")) response.sendRedirect("/docs"); else response.sendError(404);
             return;
         }
         response.setHeader("X-Content-Type-Options", "nosniff");
-        boolean plugin=officeEnabled && path.startsWith("/office-plugin/");
-        if(plugin) {
-            response.setHeader("Content-Security-Policy","frame-ancestors 'self' "+officePublicUrl+" "+appPublicUrl);
-            response.setHeader("Cache-Control","no-store");
-            // ONLYOFFICE fetches config.json from its iframe; all other APIs retain same-origin rules.
-            if(officePublicUrl.equals(request.getHeader("Origin"))) {
-                response.setHeader("Access-Control-Allow-Origin",officePublicUrl);
-                response.setHeader("Vary","Origin");
-                response.setHeader("Access-Control-Allow-Methods","GET, OPTIONS");
-            }
-            if("OPTIONS".equals(request.getMethod())) {response.setStatus(204);return;}
-        } else response.setHeader("X-Frame-Options", path.equals("/office-editor.html")?"SAMEORIGIN":"DENY");
+        response.setHeader("X-Frame-Options", "DENY");
         response.setHeader("Referrer-Policy", "no-referrer");
         if (request.getRequestURI().startsWith("/api/")) {
             response.setHeader("Cache-Control", "no-store");
